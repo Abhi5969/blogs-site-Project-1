@@ -24,7 +24,7 @@ const createAuthor = async function (req,res){
         let validLname = validator.isAlpha(lname);
     
         if (validFname == false || validLname == false)
-          return res.status(400).send({ status: false, msg: "LastName and firstName must be in alphabate", });
+          return res.status(400).send({ status: false, msg: "LastName and firstName must be in alphabat", });
     
 
 

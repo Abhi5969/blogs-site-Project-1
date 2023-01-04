@@ -2,6 +2,8 @@
 const authorModel = require("../models/authorModel");
 const { isValid } = require("../validator/validations")
 const validator = require('validator')
+const jwt= require("jsonwebtoken")
+//*******************************************CREATE AUTHOR **************************/
 const createAuthor = async function (req,res){
     try{
         let data = req.body
@@ -37,4 +39,37 @@ const createAuthor = async function (req,res){
     }
 }
 
-module.exports.createAuthor = createAuthor
+//*******************************************LOGIN **************************/
+
+let loginAuthor = async function (req, res) {
+    try {
+      let data = req.body;
+      let { email, password } = data;
+  
+      if (!isValid(email)) {
+        return res.status(400).send({ status: false, msg: " email is required" });
+      }
+      if (!isValid(password)) {
+        return res.status(400).send({ status: false, msg: " password is required" });
+      }
+  
+      if (!validator.isEmail(email.trim())) return res.status(400).send({ status: false, msg: "You have entered an invalid email address!" });
+  
+      let validateEmail = await authorModel.findOne({ email: email.trim() });
+
+      if (!validateEmail) return res.status(404).send({ status: false, msg: "user not found" });
+  
+      if (validateEmail.password != password)
+        return res.status(401).send({ status: false, msg: "invalid password" });
+  
+      let key = jwt.sign(
+        {id: validateEmail._id.toString()},"GAS-project-1-team-16");
+  
+      res.setHeader("x-api-key", key);
+      res.status(200).send({ status: true, key: key });
+    } catch (error) {
+      res.status(500).send({ msg: error.message });
+    }
+  };
+  
+  module.exports = { loginAuthor, createAuthor }

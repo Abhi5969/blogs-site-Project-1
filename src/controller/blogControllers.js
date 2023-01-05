@@ -2,8 +2,8 @@ const authorModel = require("../models/authorModel")
 const blogModel = require("../models/blogModel")
 const { isValid } = require("../validator/validations")
 const validator = require('validator')
-const moment= require('moment')
-const today=moment()
+
+
 const createBlog = async function (req, res) {
     try {
         let data = req.body
@@ -22,7 +22,7 @@ const createBlog = async function (req, res) {
 
         if (authorId.length != 24) return res.status(400).send({ status: false, msg: "authorId is not valid" })
 
-        let validTitle = validator.isAlpha(title)
+        let validTitle = validator.isAlpha(title.trim())
         if (validTitle == false) return res.status(400).send({ status: false, msg: "title have to alphabat" })
 
 
@@ -37,7 +37,7 @@ const createBlog = async function (req, res) {
         let checkAuthor = await authorModel.findById(id);
         if (!checkAuthor) { return res.status(404).send({ status: false, msg: "Author not exist" }) }
         const resultData = await blogModel.create(data)
-        res.status(201).send({ status: true, msg: resultData })
+        res.status(201).send({ status: true, data: resultData })
     } catch (error) {
         res.status(500).send({ staus: false, message: err.message })
     }
@@ -45,40 +45,21 @@ const createBlog = async function (req, res) {
 module.exports.createBlog = createBlog
 
 let getBlogs = async function (req, res) {
+
     try {
-        let category = req.query.category;
-        let authorId = req.query.authorId;
-        let subcategory = req.query.subcategory;
-        let tags = req.query.tags;
 
-        let filter = {
-            isDeleted: false,
-            isPublished: true,
-        };
+        let data = req.query
+        data.isDeleted = false  //mst cheez h
+        data.isPublished = true
 
-        if (authorId) {
-            if (authorId.length != 24) { return res.status(400).send({ status: false, msg: "please enter a valid authorId" }) }
-            filter.authorId = authorId;
-        }
+        let saveData = await blogModel.find(data)
+        if (saveData.length === 0) return res.status(404).send({ status: false, msg: "Blog Not Found" })
+        res.status(200).send({ Status: true, msg: saveData })
 
-        if (category) {
-            filter.category = category;
-        }
-
-        if (tags) {
-            filter.tags = tags;
-        }
-
-        if (subcategory) {
-            filter.subcategory = subcategory;
-        }
-
-        let data = await blogModel.find(filter);
-        if (data.length == 0) { return res.status(404).send({ status: false, msg: "Blog is no exist" }) }
-        return res.status(200).send({ status: true, data: data })
-    } catch (error) {
-
-        res.status(500).send({ status: false, msg: error.message });
+    }
+    catch (error) {
+        console.log(error.massage)
+        res.status(500).send({ error: error.massage, msg: "Server error" })
     }
 }
 
@@ -124,7 +105,7 @@ const updateBlogsById = async function (req, res) {
         res.status(200).send({ status: true, data: blogData });
     } catch (error) {
         console.log(error.message);
-        res.status(500).send({ status: false, msg:  error.message });
+        res.status(500).send({ status: false, msg: error.message });
     }
 };
 
@@ -159,23 +140,23 @@ module.exports.deleteById = deleteById;
 
 const deleteBlogByquery = async function (req, res) {
     try {
-      let data = req.query
-      if (Object.keys(data).length == 0) return res.status(404).send({ status: false, Error: "data is required in query params" })
-  
-  
-      let savedData = await blogModel.findOne(data, { isDeleted: false})
-      if (!savedData) return res.status(404).send({ status: false, Error: "No Blog Found" })
-       let date=new Date()
-      savedData.isDeleted=true;
-      savedData.deletedAt= date
+        let data = req.query
+        if (Object.keys(data).length == 0) return res.status(404).send({ status: false, Error: "data is required in query params" })
 
-      await savedData.save()
 
-      res.status(200).send({ status: false, Msg: "data is deleted" })
-  
-  
+        let savedData = await blogModel.findOne(data, { isDeleted: false })
+        if (!savedData) return res.status(404).send({ status: false, Error: "No Blog Found" })
+        let date = new Date()
+        savedData.isDeleted = true;
+        savedData.deletedAt = date
+
+        await savedData.save()
+
+        res.status(200).send({ status: false, Msg: "data is deleted" })
+
+
     } catch (error) {
-      res.status(500).send({ status: false, Error: error.message})
-  }
-  }
-  module.exports.deleteBlogByquery = deleteBlogByquery;
+        res.status(500).send({ status: false, Error: error.message })
+    }
+}
+module.exports.deleteBlogByquery = deleteBlogByquery;

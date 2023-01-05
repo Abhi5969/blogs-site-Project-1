@@ -33,7 +33,7 @@ const createAuthor = async function (req,res){
         let checkEmail = await authorModel.findOne({email: email})
         if (checkEmail) return res.status(400).send({status: false, message: "email is already exist"})
         const resultData = await authorModel.create(data)
-        return res.status(201).send(resultData)
+        return res.status(201).send({status:true,data:resultData})
     }catch(error){
         res.status(500).send({staus: false , message :err.message})
     }
@@ -53,20 +53,21 @@ let loginAuthor = async function (req, res) {
         return res.status(400).send({ status: false, msg: " password is required" });
       }
   
-      if (!validator.isEmail(email.trim())) return res.status(400).send({ status: false, msg: "You have entered an invalid email address!" });
+      if (!validator.isEmail(email.trim())) return res.status(400).send({ status: false, msg: "You have to enter a valid email address!" });
   
-      let validateEmail = await authorModel.findOne({ email: email.trim() });
+      let validateAuthor = await authorModel.findOne({ email: email.trim() });
+    // console.log(validateAuthor)
 
-      if (!validateEmail) return res.status(404).send({ status: false, msg: "user not found" });
+      if (!validateAuthor) return res.status(404).send({ status: false, msg: "user not found" });
   
-      if (validateEmail.password != password)
+      if (validateAuthor.password != password)
         return res.status(401).send({ status: false, msg: "invalid password" });
   
       let key = jwt.sign(
-        {id: validateEmail._id.toString()},"GAS-project-1-team-16");
+        {id: validateAuthor._id},"GAS-project-1-team-16",{expiresIn : '1h'});
   
       res.setHeader("x-api-key", key);
-      res.status(200).send({ status: true, key: key });
+      res.status(200).send({ status: true, Token: key });
     } catch (error) {
       res.status(500).send({ msg: error.message });
     }

@@ -8,21 +8,22 @@ const createBlog = async function (req, res) {
     try {
         let data = req.body
         let { title, body, authorId, category } = data
+        if (Object.keys(data).length == 0) return res.status(400).send({ status: false, msg: "body is mandotary" })
 
         if (!isValid(title)) return res.status(400).send({ status: false, msg: "title is mandotary" })
 
         if (!isValid(body)) return res.status(400).send({ status: false, msg: "body is mandotary" })
 
-
-
         if (!isValid(category)) return res.status(400).send({ status: false, msg: "category is mandotary" })
 
-
-        if (Object.keys(data).length == 0) return res.status(400).send({ status: false, msg: "authorId is mandotary" })
-
         if (authorId.length != 24) return res.status(400).send({ status: false, msg: "authorId is not valid" })
+        let authid = req.body.authorId
+        if (Object.keys(authid).length == 0) return res.status(404).send({ status: false, Error: "data is required" })
+
+        if (authid != req.decode.id) return res.status(403).send({ status: false, error: "You are not autherised" })
 
         let validTitle = validator.isAlpha(title.trim())
+        
         if (validTitle == false) return res.status(400).send({ status: false, msg: "title have to alphabat" })
 
 

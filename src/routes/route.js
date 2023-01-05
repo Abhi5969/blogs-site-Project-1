@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const authorController = require("../controller/authorController")
 const blogController = require("../controller/blogControllers")
-const {Authentication,AuthorisationById,AuthorisationToQuery,AuthorisationToCreate} =require("../Middleware/middleMW")
+const {Authentication,AuthorisationById,AuthorisationToQuery} =require("../Middleware/middleMW")
 
 router.post("/authors",authorController.createAuthor)
 
-router.post("/blogs", Authentication,AuthorisationToCreate, blogController.createBlog)
+router.post("/blogs", Authentication, blogController.createBlog)
 
 router.get("/blogs", Authentication,blogController.getBlogs)
 

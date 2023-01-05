@@ -30,7 +30,7 @@ let AuthorisationById = async function (req, res, next) {
     let blogId = req.params.blogId
     if (!mongoose.isValidObjectId(blogId)) return res.status(400).send({ status: false, error: 'Invalid blog id' })  
     const blogs= await blogModel.findOne({_id:blogId, isDeleted:false})
-    if(blogs== null) return res.status(404).send({status: false, error: "blog is not found"})
+    if(!blogs) return res.status(404).send({status: false, error: "blog is not found"})
     let authorid= blogs.authorId
     if(authorid != req.decode.id) return res.status(403).send({status: false, error: "You are not autherised"})  
     next();
@@ -39,8 +39,6 @@ let AuthorisationById = async function (req, res, next) {
     return res.status(500).send({status:false, error: error.message });
   }
 };
-
-
 
 let AuthorisationToQuery = async function (req, res, next) {
   try {
@@ -59,11 +57,5 @@ let AuthorisationToQuery = async function (req, res, next) {
    }
 };
 
-const AuthorisationToCreate = async function (req,res,next){
-      let authid = req.body.authorId
-      if(Object.keys(authid).length == 0)  return res.status(404).send({ status: false, Error: "data is required" })
 
-      if(authid != req.decode.id ) return res.status(403).send({status: false, error: "You are not autherised"}) 
-      next();
-}
-module.exports = { Authentication, AuthorisationById, AuthorisationToQuery,AuthorisationToCreate }
+module.exports = { Authentication, AuthorisationById, AuthorisationToQuery }

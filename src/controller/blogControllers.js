@@ -4,7 +4,7 @@ const { isValid } = require("../validator/validations")
 const validator = require('validator')
 const mongoose = require('mongoose');
 
-
+// ************************************API CREATEBLOG ************************************
 const createBlog = async function (req, res) {
     try {
         let data = req.body
@@ -39,7 +39,7 @@ const createBlog = async function (req, res) {
     }
 }
 
-
+// ************************************API GETBLOG ************************************
 let getBlogs = async function (req, res) {
 
     try {
@@ -71,7 +71,7 @@ let getBlogs = async function (req, res) {
 }
 
 
-
+// ************************************API UPDATEBLOG ************************************
 const updateBlogsById = async function (req, res) {
     try {
         let data = req.body;
@@ -122,7 +122,7 @@ const updateBlogsById = async function (req, res) {
     }
 };
 
-
+// ************************************API DELETEBLOG/BYID ************************************
 
 let deleteById = async function (req, res) {
     try {
@@ -154,7 +154,7 @@ let deleteById = async function (req, res) {
     }
 };
 
-
+// ************************************API DELETEBLOG/BY/QUERY ************************************
 
 const deleteBlogByquery = async function (req, res) {
     try {
